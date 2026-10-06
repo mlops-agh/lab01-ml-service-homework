@@ -10,6 +10,7 @@ requires-python = ">=3.12"
 dependencies = [
     "clean-text>=0.7.1",
     "joblib>=1.6.0",
+    "pre-commit>=4.6.2",
     "scikit-learn>=1.9.1",
     "sentence-transformers>=6.1.0",
     "torch>=2.11.0",
@@ -35,5 +36,6 @@ explicit = true
 [dependency-groups]
 dev = [
     "httpx2>=2.13.1",
+    "mypy>=2.4.0",
     "pytest>=9.1.1",
 ]
