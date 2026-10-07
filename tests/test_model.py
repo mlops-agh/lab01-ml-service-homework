@@ -1,6 +1,6 @@
 import pytest
 
-from ml_service.model.predictor import LABELS, predict
+from ml_service.model.predictor import LABELS
 
 SAMPLES = [
     "I love this product, it is fantastic!",
@@ -9,13 +9,11 @@ SAMPLES = [
 ]
 
 
-def test_model_loads_without_errors():
-    from ml_service.model.initializer import classifier, embedder
-
-    assert hasattr(classifier, "predict")
-    assert hasattr(embedder, "encode")
+def test_model_loads_without_errors(predictor):
+    assert hasattr(predictor.classifier, "predict")
+    assert hasattr(predictor.embedder, "encode")
 
 
 @pytest.mark.parametrize("text", SAMPLES)
-def test_inference_returns_known_label(text):
-    assert predict(text) in set(LABELS.values())
+def test_inference_returns_known_label(predictor, text):
+    assert predictor.predict(text) in set(LABELS.values())

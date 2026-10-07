@@ -1,13 +1,26 @@
 import pytest
-from fastapi.testclient import TestClient
 
 from ml_service.app import app
 from ml_service.model.predictor import LABELS
 
-client = TestClient(app)
+
+def test_health_ok_after_startup(client):
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}
 
 
-def test_predict_returns_valid_json():
+def test_health_loading_before_startup(client_no_models, monkeypatch):
+    # app.state is shared across the session, so simulate "models not loaded yet"
+    monkeypatch.delattr(app.state, "predictor", raising=False)
+    response = client_no_models.get("/health")
+
+    assert response.status_code == 503
+    assert response.json() == {"status": "loading"}
+
+
+def test_predict_returns_valid_json(client):
     response = client.post("/predict", json={"text": "I love this!"})
 
     assert response.status_code == 200
@@ -26,8 +39,8 @@ def test_predict_returns_valid_json():
         {"text": None},  # null
     ],
 )
-def test_invalid_input_returns_json_error_with_explanation(payload):
-    response = client.post("/predict", json=payload)
+def test_invalid_input_returns_json_error_with_explanation(client_no_models, payload):
+    response = client_no_models.post("/predict", json=payload)
 
     assert response.status_code == 422
     assert response.headers["content-type"] == "application/json"
@@ -37,8 +50,8 @@ def test_invalid_input_returns_json_error_with_explanation(payload):
     assert detail[0]["msg"]
 
 
-def test_malformed_json_returns_json_error():
-    response = client.post(
+def test_malformed_json_returns_json_error(client_no_models):
+    response = client_no_models.post(
         "/predict",
         content="{not json",
         headers={"Content-Type": "application/json"},
