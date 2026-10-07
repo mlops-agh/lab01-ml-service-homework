@@ -26,7 +26,6 @@ class Predictor:
         return cls(embedder, classifier)
 
     def predict(self, text: str) -> str:
-        # encode() takes a batch, so wrap the single text in a list
         embedding = self.embedder.encode([text])
         class_id = int(self.classifier.predict(embedding)[0])
         return LABELS[class_id]

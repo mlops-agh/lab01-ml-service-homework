@@ -12,7 +12,7 @@ dependencies = [
     "fastapi>=0.142.2",
     "joblib>=1.6.0",
     "pre-commit>=4.6.2",
-    "scikit-learn>=1.9.1",
+    "scikit-learn==1.7.2",
     "sentence-transformers>=6.1.0",
     "torch>=2.11.0",
     "uvicorn>=0.54.0",

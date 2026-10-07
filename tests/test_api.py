@@ -1,4 +1,5 @@
 import pytest
+from starlette.testclient import TestClient
 
 from ml_service.app import app
 from ml_service.model.predictor import LABELS
@@ -11,8 +12,9 @@ def test_health_ok_after_startup(client):
     assert response.json() == {"status": "ok"}
 
 
-def test_health_loading_before_startup(client_no_models, monkeypatch):
-    # app.state is shared across the session, so simulate "models not loaded yet"
+def test_health_loading_before_startup(
+    client_no_models: TestClient, monkeypatch: pytest.MonkeyPatch
+):
     monkeypatch.delattr(app.state, "predictor", raising=False)
     response = client_no_models.get("/health")
 
@@ -20,7 +22,7 @@ def test_health_loading_before_startup(client_no_models, monkeypatch):
     assert response.json() == {"status": "loading"}
 
 
-def test_predict_returns_valid_json(client):
+def test_predict_returns_valid_json(client: TestClient):
     response = client.post("/predict", json={"text": "I love this!"})
 
     assert response.status_code == 200
@@ -39,7 +41,9 @@ def test_predict_returns_valid_json(client):
         {"text": None},  # null
     ],
 )
-def test_invalid_input_returns_json_error_with_explanation(client_no_models, payload):
+def test_invalid_input_returns_json_error_with_explanation(
+    client_no_models: TestClient, payload
+):
     response = client_no_models.post("/predict", json=payload)
 
     assert response.status_code == 422
@@ -50,7 +54,7 @@ def test_invalid_input_returns_json_error_with_explanation(client_no_models, pay
     assert detail[0]["msg"]
 
 
-def test_malformed_json_returns_json_error(client_no_models):
+def test_malformed_json_returns_json_error(client_no_models: TestClient):
     response = client_no_models.post(
         "/predict",
         content="{not json",

@@ -26,5 +26,6 @@ def health(request: Request, response: Response) -> dict[str, str]:
 
 @app.post("/predict")
 def predict(request: Request, body: PredictRequest) -> PredictResponse:
-    prediction = request.app.state.predictor.predict(body.text)
+    predictor = request.app.state.predictor
+    prediction = predictor.predict(body.text)
     return PredictResponse(prediction=prediction)
