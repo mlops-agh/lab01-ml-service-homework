@@ -1,7 +1,10 @@
 name: ml-service
 services:
   ml-app:
-    build: .
+    build:
+      context: .
+      args:
+        TORCH_VARIANT: cpu  # or "cu128" for GPU
     ports:
       - "8000:8000"
     networks:

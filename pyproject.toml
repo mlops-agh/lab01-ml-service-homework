@@ -13,7 +13,6 @@ dependencies = [
     "joblib>=1.6.0",
     "scikit-learn==1.7.2",
     "sentence-transformers>=6.1.0",
-    "torch>=2.11.0",
     "uvicorn>=0.54.0",
 ]
 
@@ -24,10 +23,25 @@ ml-service = "ml_service:main"
 requires = ["uv_build>=0.12.23,<0.13.0"]
 build-backend = "uv_build"
 
+[project.optional-dependencies]
+cpu = ["torch>=2.11.0"]
+cu128 = ["torch>=2.11.0"]
+
+[tool.uv]
+conflicts = [
+    [{ extra = "cpu" }, { extra = "cu128" }],
+]
+
 [tool.uv.sources]
 torch = [
-    { index = "pytorch-cu128" },
+    { index = "pytorch-cpu", extra = "cpu" },
+    { index = "pytorch-cu128", extra = "cu128" },
 ]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [[tool.uv.index]]
 name = "pytorch-cu128"
