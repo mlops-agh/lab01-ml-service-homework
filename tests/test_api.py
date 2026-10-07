@@ -1,7 +1,6 @@
 import pytest
 from starlette.testclient import TestClient
 
-from ml_service.app import app
 from ml_service.model.predictor import LABELS
 
 
@@ -12,10 +11,7 @@ def test_health_ok_after_startup(client):
     assert response.json() == {"status": "ok"}
 
 
-def test_health_loading_before_startup(
-    client_no_models: TestClient, monkeypatch: pytest.MonkeyPatch
-):
-    monkeypatch.delattr(app.state, "predictor", raising=False)
+def test_health_loading_before_startup(client_no_models: TestClient):
     response = client_no_models.get("/health")
 
     assert response.status_code == 503
