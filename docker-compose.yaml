@@ -1,0 +1,11 @@
+name: ml-service
+services:
+  ml-app:
+    build: .
+    ports:
+      - "8000:8000"
+    networks:
+      - service-network
+
+networks:
+  service-network:
